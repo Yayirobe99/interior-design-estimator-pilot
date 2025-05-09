@@ -23,9 +23,14 @@ const Projects = () => {
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Proyectos</h1>
-          <Button asChild>
-            <Link to="/new-project">Nuevo proyecto</Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild variant="outline">
+              <Link to="/budget-estimator">Estimador de Presupuesto</Link>
+            </Button>
+            <Button asChild>
+              <Link to="/new-project">Nuevo proyecto</Link>
+            </Button>
+          </div>
         </div>
 
         <div className="mb-6">
