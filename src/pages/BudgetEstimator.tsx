@@ -13,9 +13,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatDimensions } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
-import { Plus, Filter, Edit } from "lucide-react";
+import { Plus, Filter, Edit, Image as ImageIcon } from "lucide-react";
+import ItemDetailPanel from "@/components/ItemDetailPanel";
 
 // Simplificación de datos para el ejemplo (esto vendría de la API conectada a PostgreSQL)
 type BudgetItem = {
@@ -84,6 +85,7 @@ const BudgetEstimator = () => {
   const [filter, setFilter] = useState<string>("todos");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [grandTotal, setGrandTotal] = useState<number>(0);
+  const [selectedItem, setSelectedItem] = useState<BudgetItem | null>(null);
   const { toast } = useToast();
 
   // Filtrar items según los criterios
@@ -133,11 +135,21 @@ const BudgetEstimator = () => {
     });
   };
 
+  // Mostrar panel de detalles del ítem
+  const showItemDetails = (item: BudgetItem) => {
+    setSelectedItem(item);
+  };
+
+  // Cerrar panel de detalles
+  const closeItemDetails = () => {
+    setSelectedItem(null);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main className="flex-grow container mx-auto px-4 py-8 relative">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Estimador de Presupuesto</h1>
           <Button>
@@ -169,10 +181,11 @@ const BudgetEstimator = () => {
           </Select>
         </div>
         
-        <div className="rounded-md border shadow">
+        <div className="rounded-md border shadow overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[60px]"></TableHead>
                 <TableHead className="w-[100px]">Código</TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead className="w-[150px]">Categoría</TableHead>
@@ -185,18 +198,32 @@ const BudgetEstimator = () => {
             </TableHeader>
             <TableBody>
               {filteredItems.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow 
+                  key={item.id} 
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => showItemDetails(item)}
+                >
+                  <TableCell className="p-2">
+                    <div className="w-10 h-10 relative rounded overflow-hidden bg-gray-100">
+                      {item.image_url ? (
+                        <img 
+                          src={item.image_url} 
+                          alt={item.item_name} 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full">
+                          <ImageIcon className="h-5 w-5 text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell className="font-medium">{item.item_code}</TableCell>
                   <TableCell>
                     <div>
                       {item.item_name}
                       {item.description && (
-                        <p className="text-xs text-gray-500 mt-1">{item.description}</p>
-                      )}
-                      {item.width_mm && item.depth_mm && item.height_mm && (
-                        <p className="text-xs text-gray-500">
-                          {item.width_mm} × {item.depth_mm} × {item.height_mm} mm
-                        </p>
+                        <p className="text-xs text-gray-500 mt-1 line-clamp-1">{item.description}</p>
                       )}
                     </div>
                   </TableCell>
@@ -208,13 +235,24 @@ const BudgetEstimator = () => {
                       type="number" 
                       value={item.total_qty} 
                       min={0}
-                      onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 0)}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        updateQuantity(item.id, parseInt(e.target.value) || 0);
+                      }}
+                      onClick={(e) => e.stopPropagation()}
                       className="w-20"
                     />
                   </TableCell>
                   <TableCell className="text-right font-medium">{formatCurrency(item.total)}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon">
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        showItemDetails(item);
+                      }}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
                   </TableCell>
@@ -244,6 +282,15 @@ const BudgetEstimator = () => {
             </div>
           </div>
         </div>
+        
+        {/* Panel de detalles del ítem */}
+        {selectedItem && (
+          <ItemDetailPanel 
+            {...selectedItem} 
+            onClose={closeItemDetails}
+            onUpdateQuantity={updateQuantity}
+          />
+        )}
       </main>
       
       <Footer />
