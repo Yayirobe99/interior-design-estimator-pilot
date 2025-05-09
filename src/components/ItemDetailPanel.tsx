@@ -1,6 +1,6 @@
 
 import React from "react";
-import { X, Image as ImageIcon } from "lucide-react";
+import { X, Image as ImageIcon, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDimensions, getImageUrl } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -128,7 +128,7 @@ const ItemDetailPanel: React.FC<ItemDetailProps> = ({
                 onClick={() => handleQuantityChange(quantity - 1)}
                 disabled={quantity <= 0}
               >
-                <minus className="h-4 w-4" />
+                <Minus className="h-4 w-4" />
               </Button>
               <input
                 type="number"
@@ -142,7 +142,7 @@ const ItemDetailPanel: React.FC<ItemDetailProps> = ({
                 size="icon" 
                 onClick={() => handleQuantityChange(quantity + 1)}
               >
-                <plus className="h-4 w-4" />
+                <Plus className="h-4 w-4" />
               </Button>
             </div>
           </div>
