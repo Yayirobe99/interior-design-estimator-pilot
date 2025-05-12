@@ -20,7 +20,7 @@ const Header = () => {
             Ítems
           </Link>
           <Link to="/design-spec" className="text-gray-600 hover:text-interior-blue transition-colors">
-            DesignSpec
+            Libro de Especificaciones
           </Link>
           <Link to="/about" className="text-gray-600 hover:text-interior-blue transition-colors">
             Acerca de
